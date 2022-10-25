@@ -1,11 +1,15 @@
+# escape=`
 FROM microsoft/nanoserver
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
+ENV RETHINKDB_VERSION 2.3.6
+ENV RETHINKDB_DOWNLOAD_URL https://download.rethinkdb.com/windows/rethinkdb-${RETHINKDB_VERSION}.zip
+
 # Install RethinkDB.
-RUN Invoke-WebRequest "https://download.rethinkdb.com/windows/rethinkdb-2.3.6.zip" -OutFile 'rethinkdb-2.3.6.zip' -UseBasicParsing ; \
-    Expand-Archive 'rethinkdb-2.3.6.zip' -DestinationPath '.' ; \
-    Remove-Item 'rethinkdb-2.3.6.zip'
+RUN Invoke-WebRequest $env:RETHINKDB_DOWNLOAD_URL -OutFile 'rethinkdb.zip' -UseBasicParsing ; `
+    Expand-Archive 'rethinkdb.zip' -DestinationPath '.' ; `
+    Remove-Item 'rethinkdb.zip'
 
 # Define mountable directories.
 VOLUME ["c:/data"]
@@ -14,7 +18,7 @@ VOLUME ["c:/data"]
 WORKDIR c:/data
 
 # Define default command.
-CMD ["c:/rethinkdb-2.3.6/rethinkdb", "--bind", "all"]
+CMD ["c:/rethinkdb/rethinkdb", "--bind", "all"]
 
 # Expose ports.
 #   - 8080: web UI
